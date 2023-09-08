@@ -16,6 +16,8 @@ import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { KeyboardIcon } from "@radix-ui/react-icons";
 
 const eventSchema = z.object({
   name: z.string(),
@@ -35,15 +37,23 @@ export const NewEventForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof eventSchema>) => {
-    await create({ name: values.name });
-    router.replace("/");
+    const newId = await create({ name: values.name });
+    router.replace(`/events/${newId}`);
 
     form.reset();
   };
 
   return (
     <Form {...form}>
-      <h1 className="mb-4 text-2xl font-semibold">Crete event</h1>
+      <h1 className="text-2xl font-semibold">Crete event</h1>
+      <Alert className="my-4">
+        <KeyboardIcon />
+        <AlertTitle>Heads up!</AlertTitle>
+        <AlertDescription>
+          You will be able to add more details on the event&apos;s page
+        </AlertDescription>
+      </Alert>
+      <span className="mb-4 block text-slate-400"></span>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-4"

@@ -12,6 +12,7 @@ import {
   HomeIcon,
 } from "@radix-ui/react-icons";
 import { Sidenav, SidenavItem } from "@/components/sidenav";
+import { ThemeProvider } from "@/context/theme";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,15 +49,17 @@ export default function RootLayout({
       <ConvexClientProvider>
         <html lang="en">
           <body className={inter.className}>
-            <div className="flex min-h-screen flex-col">
-              <Header />
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+              <div className="flex min-h-screen flex-col">
+                <Header />
 
-              <div className="flex flex-1 flex-row gap-24 px-24 py-12">
-                <Sidenav items={sidenavItems} />
+                <div className="flex flex-1 flex-row gap-24 px-24 py-12">
+                  <Sidenav items={sidenavItems} />
 
-                {children}
+                  {children}
+                </div>
               </div>
-            </div>
+            </ThemeProvider>
           </body>
         </html>
       </ConvexClientProvider>

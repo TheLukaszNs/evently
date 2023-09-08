@@ -10,4 +10,15 @@ export default defineSchema({
     name: v.string(),
     userId: v.id("users"),
   }),
+  widgets: defineTable({
+    name: v.string(),
+    userId: v.id("users"),
+    eventId: v.id("events"),
+    type: v.union(
+      v.literal("organizers"),
+      v.literal("comments"),
+      v.literal("location"),
+    ),
+    config: v.string(),
+  }).index("by_event", ["eventId"]),
 });

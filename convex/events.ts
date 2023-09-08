@@ -27,6 +27,15 @@ export const list = query({
   },
 });
 
+export const get = query({
+  args: {
+    id: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.get(args.id);
+  },
+});
+
 export const createEvent = mutation({
   args: {
     name: v.string(),
@@ -49,9 +58,18 @@ export const createEvent = mutation({
       throw new Error("Unauthorized");
     }
 
-    await ctx.db.insert("events", {
+    return ctx.db.insert("events", {
       name: args.name,
       userId: user._id,
     });
+  },
+});
+
+export const deleteEvent = mutation({
+  args: {
+    id: v.id("events"),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.delete(args.id);
   },
 });

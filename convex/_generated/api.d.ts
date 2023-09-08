@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as events from "../events";
 import type * as users from "../users";
+import type * as widgets from "../widgets";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -28,6 +29,7 @@ import type * as users from "../users";
 declare const fullApi: ApiFromModules<{
   events: typeof events;
   users: typeof users;
+  widgets: typeof widgets;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
