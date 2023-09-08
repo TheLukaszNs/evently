@@ -1,7 +1,7 @@
-import { Map, MessageSquare, User } from "lucide-react";
+import { GalleryHorizontalEnd, Map, MessageSquare, User } from "lucide-react";
 import { ReactNode } from "react";
 
-export type WidgetKind = "organizers" | "comments" | "location";
+export type WidgetKind = "organizers" | "comments" | "location" | "stories";
 
 export type WidgetOption = {
   icon: ReactNode;
@@ -26,5 +26,10 @@ export const WIDGET_OPTIONS: WidgetOption[] = [
     icon: <Map className={iconClass} />,
     label: "Location",
     value: "location",
+  },
+  {
+    icon: <GalleryHorizontalEnd className={iconClass} />,
+    label: "Evently Stories",
+    value: "stories",
   },
 ];

@@ -1,40 +1,32 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Widget } from "@/components/widget";
+import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useMutation, useQuery } from "convex/react";
+import { HandMetal } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
-import { useMutation, useQuery } from "convex/react";
-import { Button } from "@/components/ui/button";
-import { PlusIcon, TrashIcon } from "@radix-ui/react-icons";
-import { useRouter } from "next/navigation";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { WIDGET_OPTIONS } from "@/config/widgets";
+import { SettingsDialog } from "./components/settings-dialog";
+import { WidgetsDropdown } from "./components/widgets-dropdown";
 
-export default function EventPage({ params }: { params: { id: string } }) {
+export default function EventPage({
+  params,
+}: {
+  params: { id: Id<"events"> };
+}) {
   const router = useRouter();
 
   const data = useQuery(api.events.get, {
-    id: params.id as Id<"events">,
+    id: params.id,
   });
   const widgets = useQuery(api.widgets.list, {
-    eventId: params.id as Id<"events">,
+    eventId: params.id,
   });
 
   const deleteEvent = useMutation(api.events.deleteEvent);
-  const createWidget = useMutation(api.widgets.create);
+  // const deleteWidget = useMutation(api.widgets.remove);
 
   if (!data) {
     return <div>Loading...</div>;
@@ -49,78 +41,58 @@ export default function EventPage({ params }: { params: { id: string } }) {
             {new Date(data._creationTime).toISOString()}
           </span>
         </div>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="ml-auto">
-              <Button
-                variant="destructive"
-                onClick={async () => {
-                  await deleteEvent({
-                    id: params.id as Id<"events">,
-                  });
-                  router.push("/");
-                }}
-              >
-                <TrashIcon />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete this event</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="ml-auto flex flex-row items-center">
+          <SettingsDialog eventId={params.id} />
+          <Button
+            title="Delete event"
+            variant="destructive"
+            size="icon"
+            onClick={async () => {
+              await deleteEvent({
+                id: params.id as Id<"events">,
+              });
+              router.push("/");
+            }}
+          >
+            <TrashIcon />
+          </Button>
+        </div>
       </div>
 
       <div className="mb-4 grid grid-cols-2 gap-4">
-        {widgets?.map((widget) => (
-          <Card key={widget._id}>
-            <CardHeader>
-              <CardTitle>
-                {widget.name} ({widget.type})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-row gap-4">
-                  <Button variant="outline">Edit</Button>
-                  <Button variant="outline">Delete</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {widgets?.map((widget) => <Widget key={widget._id} widget={widget} />)}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-full flex-1 gap-2 py-8"
-            >
-              Add new widget
-              <PlusIcon />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-80">
-            <DropdownMenuLabel>Widgets</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {WIDGET_OPTIONS.map((widget) => (
-              <DropdownMenuItem
-                disabled={widgets?.some((w) => w.type === widget.value)}
-                key={widget.value}
-                onClick={async () => {
-                  await createWidget({
-                    eventId: params.id as Id<"events">,
-                    config: JSON.stringify({}),
-                    name: "New widget",
-                    type: widget.value,
-                  });
-                }}
+        {widgets?.length === 0 ? (
+          <article className="col-span-2 flex flex-col items-center gap-4">
+            <div className="flex flex-row items-center gap-4 text-xl text-slate-600">
+              <h3 className="font-bold">
+                This event has not yet been configured
+              </h3>
+              <HandMetal size={32} />
+            </div>
+            <div className="flex flex-row items-center gap-2 text-center text-slate-400">
+              Let&apos;s get you started with your{" "}
+              <WidgetsDropdown
+                trigger={<Button variant="ghost">first widget</Button>}
+                eventId={params.id as Id<"events">}
+              />
+            </div>
+          </article>
+        ) : (
+          <WidgetsDropdown
+            trigger={
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-full flex-1 gap-2 py-8"
               >
-                {widget.icon}
-                <span>{widget.label}</span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+                Add new widget
+                <PlusIcon />
+              </Button>
+            }
+            eventId={params.id as Id<"events">}
+          />
+        )}
       </div>
     </div>
   );

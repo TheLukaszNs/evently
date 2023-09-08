@@ -18,6 +18,7 @@ export default defineSchema({
       v.literal("organizers"),
       v.literal("comments"),
       v.literal("location"),
+      v.literal("stories"),
     ),
     config: v.string(),
   }).index("by_event", ["eventId"]),

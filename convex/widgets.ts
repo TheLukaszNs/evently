@@ -9,6 +9,7 @@ export const create = mutation({
       v.literal("organizers"),
       v.literal("comments"),
       v.literal("location"),
+      v.literal("stories"),
     ),
     config: v.string(),
   },
@@ -46,5 +47,14 @@ export const list = query({
       .query("widgets")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect();
+  },
+});
+
+export const remove = mutation({
+  args: {
+    id: v.id("widgets"),
+  },
+  handler: async (ctx, args) => {
+    return ctx.db.delete(args.id);
   },
 });
